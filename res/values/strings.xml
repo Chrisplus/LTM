@@ -10,4 +10,22 @@
     <string name="button_stop">Stop</string>
     <string name="button_checking">Processing</string>
 
+    <!-- General -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="reset">Reset</string>
+    <string name="done">Done</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <!-- Error Info -->
+    <string name="error_default_title">LTM Error Occurred</string>
+    <string name="error_default_text">Some Error Occurred</string>
+    <string name="error_noroot">LTM requires root/superuser access</string>
+    <string name="error_openlogfile">Failed to open logfile:\u0020</string>
+    <string name="error_unsupported_system_title">Unsupported system</string>
+    <string name="error_unsupported_system_text">The CPU type \'%s\' is currently unsupported. Please use the Bug Report/Feedback option to request support.</string>
+    <string name="error_install_binary_text">Install %s error:\u0020</string>
+
 </resources>

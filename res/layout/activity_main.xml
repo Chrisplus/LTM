@@ -14,7 +14,8 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="@string/button_checking" />
+        android:text="@string/button_checking"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/AboutText"
