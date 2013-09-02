@@ -4,5 +4,10 @@
     <string name="app_name">LTM</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="about_title">LTM (Longterm Traffic Monitor)\n By Chrisplus 2013</string>
+    <string name="about_warning">LTM will collect your network traffic info such as data uasge from which application and may result in external energy consumption.</string>
+    <string name="button_start">Start</string>
+    <string name="button_stop">Stop</string>
+    <string name="button_checking">Processing</string>
 
 </resources>
