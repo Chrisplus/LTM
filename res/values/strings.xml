@@ -29,4 +29,8 @@
     <string name="error_unsupported_system_text">The CPU type \'%s\' is currently unsupported. Please use the Bug Report/Feedback option to request support.</string>
     <string name="error_install_binary_text">Install %s error:\u0020</string>
 
+    <!-- Notification -->
+    <string name="notification_title">LTM is running</string>
+    <string name="notification_content">NONE</string>
+
 </resources>
