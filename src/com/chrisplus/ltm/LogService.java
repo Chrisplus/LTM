@@ -50,15 +50,14 @@ public class LogService extends Service {
 
     @Override
     public void onCreate() {
-        // TODO Auto-generated method stub
+        Log.d(TAG, "onCreate");
         super.onCreate();
     }
 
     @Override
     public void onDestroy() {
-        // TODO Auto-generated method stub
+        Log.d(TAG, "OnDestroy");
         super.onDestroy();
     }
-    
-    
+
 }

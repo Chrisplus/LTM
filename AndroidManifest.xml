@@ -22,6 +22,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name="com.chrisplus.ltm.LogService"
+            android:label="@string/service_name" >
+        </service>
     </application>
 
 </manifest>

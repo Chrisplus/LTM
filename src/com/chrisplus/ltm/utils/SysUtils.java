@@ -6,14 +6,14 @@
 
 package com.chrisplus.ltm.utils;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.InputStream;
-import java.io.PrintWriter;
+import java.util.List;
 import java.util.zip.ZipInputStream;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -193,5 +193,19 @@ public class SysUtils {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .putExtra("title", title)
                 .putExtra("message", message));
+    }
+
+    public static boolean isServiceRunning(Context context, String serviceClassName) {
+        final ActivityManager activityManager = (ActivityManager) context
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        final List<RunningServiceInfo> services = activityManager
+                .getRunningServices(Integer.MAX_VALUE);
+
+        for (RunningServiceInfo runningServiceInfo : services) {
+            if (runningServiceInfo.service.getClassName().equals(serviceClassName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

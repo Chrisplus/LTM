@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">LTM</string>
+    <string name="service_name">LTM Service</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="about_title">LTM (Longterm Traffic Monitor)\n By Chrisplus 2013</string>

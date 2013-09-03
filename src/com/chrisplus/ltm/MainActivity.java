@@ -1,14 +1,21 @@
 
 package com.chrisplus.ltm;
 
+import com.chrisplus.ltm.utils.SysUtils;
+
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
 public class MainActivity extends Activity {
+
+    private final static String TAG = MainActivity.class.getSimpleName();
 
     /* UI Component */
     private Button actionButton;
@@ -30,31 +37,23 @@ public class MainActivity extends Activity {
 
     private void init() {
         actionButton = (Button) findViewById(R.id.ActionButton);
-        updateButtonState();
         actionButton.setOnClickListener(new OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 boolean isRunning = (Boolean) v.getTag();
                 if (isRunning) {
                     /* stop service */
                     // TODO
+                    isRunning = !stopService();
                 } else {
                     /* start service */
                     // TODO
+                    isRunning = startService();
                 }
                 /* Without Check */
-                updateButtonState(!isRunning);
+                updateButtonState(isRunning);
             }
         });
-    }
-
-    private void updateButtonState() {
-        /* Check the Service State */
-        // TODO
-
-        boolean serviceState = false;
-        updateButtonState(serviceState);
     }
 
     private void updateButtonState(boolean isRunning) {
@@ -72,6 +71,35 @@ public class MainActivity extends Activity {
             /* Set is running */
             actionButton.setTag(false);
         }
+    }
+
+    private boolean startService() {
+        ComponentName name = null;
+        try {
+            name = startService(new Intent(this, LogService.class));
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        if (name != null) {
+            Log.d(TAG, "Get Component Name is " + name.getClassName());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean stopService() {
+        return stopService(new Intent(this, LogService.class));
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "Resume and Check State");
+        boolean isRunning = SysUtils.isServiceRunning(this, LogService.class.getName());
+        updateButtonState(isRunning);
+        super.onResume();
     }
 
 }
