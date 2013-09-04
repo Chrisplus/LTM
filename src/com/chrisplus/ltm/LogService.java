@@ -123,7 +123,11 @@ public class LogService extends Service {
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
         builder.setContentIntent(contentIntent);
-        return builder.build();
+        Notification noti = builder.build();
+        noti.flags |= Notification.FLAG_ONGOING_EVENT;
+        noti.flags |= Notification.FLAG_NO_CLEAR;
+        noti.flags |= Notification.FLAG_SHOW_LIGHTS;
+        return noti;
     }
 
     public class CoreLogger implements Runnable {
