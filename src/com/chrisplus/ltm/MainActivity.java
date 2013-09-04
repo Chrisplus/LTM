@@ -1,10 +1,14 @@
 
 package com.chrisplus.ltm;
 
-import com.chrisplus.ltm.utils.SysUtils;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +16,9 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+
+import com.chrisplus.ltm.utils.Constants;
+import com.chrisplus.ltm.utils.SysUtils;
 
 public class MainActivity extends Activity {
 
@@ -74,6 +81,8 @@ public class MainActivity extends Activity {
     }
 
     private boolean startService() {
+        installBinaries();
+
         ComponentName name = null;
         try {
             name = startService(new Intent(this, LogService.class));
@@ -100,6 +109,26 @@ public class MainActivity extends Activity {
         boolean isRunning = SysUtils.isServiceRunning(this, LogService.class.getName());
         updateButtonState(isRunning);
         super.onResume();
+    }
+
+    private void installBinaries() {
+        SysUtils.installBinaries(this);
+
+        /* Write SH file */
+        synchronized (Constants.EXE_SCRIPT) {
+            String scriptFile = new ContextWrapper(this).getFilesDir().getAbsolutePath()
+                    + File.separator + Constants.EXE_SCRIPT;
+            String binaryPath = getFilesDir().getAbsolutePath() + File.separator
+                    + SysUtils.getGrepBinary();
+
+            try {
+                PrintWriter script = new PrintWriter(new BufferedWriter(new FileWriter(scriptFile)));
+                script.println(binaryPath + " {NL} /proc/kmsg");
+                script.close();
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

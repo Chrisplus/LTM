@@ -19,4 +19,8 @@ public class Constants {
 
     /* Notification ID */
     public final static int NOTIFICATION_ID = Application.class.getName().hashCode();
+
+    /* Execution Script Name */
+    public final static String EXE_SCRIPT = "run_ltm.sh";
+
 }
