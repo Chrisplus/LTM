@@ -1,7 +1,10 @@
 
 package com.chrisplus.ltm.utils;
 
+import java.io.File;
+
 import android.app.Application;
+import android.os.Build;
 
 /**
  * This class is used to record the constants for LTM project.
@@ -20,7 +23,14 @@ public class Constants {
     /* Notification ID */
     public final static int NOTIFICATION_ID = Application.class.getName().hashCode();
 
-    /* Execution Script Name */
+    /* Execution Script & File Name */
     public final static String EXE_SCRIPT = "run_ltm.sh";
+    public final static String CREATE_TIME = System.currentTimeMillis() + "";
+    public final static String LOG_PATH = android.os.Environment.getExternalStorageDirectory()
+            + File.separator + "LTM_LOG" + File.separator;
+    public final static String LOG_FILE = CREATE_TIME + "_" + Build.USER + "_"
+            + "NetworkTrafficLog.csv";
+    public final static String MAP_FILE = CREATE_TIME + "_" + Build.PRODUCT + "_"
+            + "ApplicationUIDMap.csv";
 
 }

@@ -8,6 +8,7 @@ package com.chrisplus.ltm.utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.zip.ZipInputStream;
@@ -207,5 +208,21 @@ public class SysUtils {
             }
         }
         return false;
+    }
+
+    public static void checkFileEnvironment(String fileName) {
+        File path = new File(Constants.LOG_PATH);
+        if (!path.exists()) {
+            path.mkdirs();
+        }
+
+        File file = new File(Constants.LOG_PATH + fileName);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

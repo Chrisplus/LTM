@@ -99,7 +99,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private boolean stopService() {
+    private boolean stopService() {       
         return stopService(new Intent(this, LogService.class));
     }
 
