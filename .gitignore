@@ -19,5 +19,6 @@ local.properties
 .classpath
 .project
 
-# Key
+# Ant
 android.keystore
+project.properties
