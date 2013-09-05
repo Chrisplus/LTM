@@ -95,8 +95,7 @@ public class LogService extends Service {
         } else {
             builder.setSmallIcon(R.drawable.notification_deactived);
         }
-        builder.setContentTitle(getString(R.string.notification_title)).setContentText(
-                getString(R.string.notification_content)).setAutoCancel(false);
+        builder.setContentTitle(getString(R.string.notification_title)).setAutoCancel(false);
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.setFlags(
