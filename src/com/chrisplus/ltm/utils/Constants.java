@@ -28,9 +28,9 @@ public class Constants {
     public final static String CREATE_TIME = System.currentTimeMillis() + "";
     public final static String LOG_PATH = android.os.Environment.getExternalStorageDirectory()
             + File.separator + "LTM_LOG" + File.separator;
-    public final static String LOG_FILE = CREATE_TIME + "_" + Build.USER + "_"
+    public final static String LOG_FILE = Build.ID + "_" + Build.PRODUCT + "_"
             + "NetworkTrafficLog.csv";
-    public final static String MAP_FILE = CREATE_TIME + "_" + Build.PRODUCT + "_"
+    public final static String MAP_FILE = Build.ID + "_" + Build.PRODUCT + "_"
             + "ApplicationUIDMap.csv";
 
 }
