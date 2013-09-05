@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
@@ -64,6 +63,10 @@ public class CoreLogger implements Runnable {
     public void terminate() {
         if (command != null) {
             command.terminate("Serice Shut it Down");
+        }
+        /* Close Parser */
+        if (parser != null) {
+            parser.close();
         }
 
         /* Record the APP UID */

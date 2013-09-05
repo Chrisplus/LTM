@@ -1,9 +1,19 @@
 
 package com.chrisplus.ltm.core;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.util.Log;
 
+import com.chrisplus.ltm.utils.Constants;
+import com.chrisplus.ltm.utils.NetStat;
 import com.chrisplus.ltm.utils.StringPool;
+import com.chrisplus.ltm.utils.SysUtils;
 
 /**
  * This class is used to parse raw log line.
@@ -12,11 +22,40 @@ import com.chrisplus.ltm.utils.StringPool;
  */
 public class CoreParser {
     private static final String TAG = CoreParser.class.getSimpleName();
+    private static HashMap<String, Integer> logEntriesMap = new HashMap<String, Integer>();
     private FastParser parser = new FastParser();
+    private PrintWriter logWriter;
+    private NetStat netstat = new NetStat();
+
+    public CoreParser() {
+        if (logWriter != null) {
+            Log.e(TAG, "Something wired happened");
+            logWriter.close();
+            logWriter = null;
+        }
+
+        SysUtils.checkFileEnvironment(Constants.LOG_FILE);
+        try {
+            logWriter = new PrintWriter(new BufferedWriter(new FileWriter(
+                    Constants.LOG_PATH + Constants.LOG_FILE, true)), true);
+        } catch (IOException e) {
+            Log.e(TAG, "Wrong Thing");
+            e.printStackTrace();
+        }
+
+        logWriter.println("Timestamp,UID,In,Out,Src,Dst,Len,Proto");
+    }
+
+    public void close() {
+        if (logWriter != null) {
+            logWriter.close();
+            logWriter = null;
+        }
+    }
 
     public void processRawLog(String rawLog) {
 
-        //Log.d(TAG, "--------------- parsing network entry --------------");
+        // Log.d(TAG, "--------------- parsing network entry --------------");
 
         int pos = 0, lastpos, thisEntry, nextEntry, newline, space;
         String in, out, src, dst, proto, uidString;
@@ -201,10 +240,84 @@ public class CoreParser {
                 continue;
             }
 
-            Log.d(TAG, "+++ entry: (" + uid + ") in=" + in + " out=" + out
-                    + " "
-                    + src + ":" + spt + " -> " + dst + ":" + dpt
-                    + " proto=" + proto + " len=" + len);
+            String srcDstMapKey = src + ":" + spt + "->" + dst + ":" + dpt;
+            String dstSrcMapKey = dst + ":" + dpt + "->" + src + ":" + spt;
+
+            Integer srcDstMapUid = logEntriesMap.get(srcDstMapKey);
+            Integer dstSrcMapUid = logEntriesMap.get(dstSrcMapKey);
+
+            if (uid < 0) {
+                // Unknown uid, retrieve from entries map
+
+                if (srcDstMapUid == null || dstSrcMapUid == null) {
+                    // refresh netstat and try again
+                    initEntriesMap();
+                    srcDstMapUid = logEntriesMap.get(srcDstMapKey);
+                    dstSrcMapUid = logEntriesMap.get(dstSrcMapKey);
+                }
+
+                if (srcDstMapUid == null) {
+
+                    if (uid == -1) {
+                        if (dstSrcMapUid != null) {
+
+                            uid = dstSrcMapUid;
+                            uidString = StringPool.get(dstSrcMapUid);
+                        } else {
+
+                            srcDstMapUid = uid;
+                            logEntriesMap.put(srcDstMapKey, srcDstMapUid);
+                        }
+                    } else {
+                        srcDstMapUid = uid;
+                        logEntriesMap.put(srcDstMapKey, srcDstMapUid);
+                    }
+                } else {
+
+                    uid = srcDstMapUid;
+                    uidString = StringPool.get(srcDstMapUid);
+                }
+
+                if (dstSrcMapUid == null) {
+
+                    if (uid == -1) {
+                        if (srcDstMapUid != null) {
+
+                            uid = srcDstMapUid;
+                            uidString = StringPool.get(srcDstMapUid);
+                        } else {
+
+                            dstSrcMapUid = uid;
+                            logEntriesMap.put(dstSrcMapKey, dstSrcMapUid);
+                        }
+                    } else {
+
+                        dstSrcMapUid = uid;
+                        logEntriesMap.put(dstSrcMapKey, dstSrcMapUid);
+                    }
+                } else {
+                    uid = dstSrcMapUid;
+                    uidString = StringPool.get(dstSrcMapUid);
+                }
+            } else {
+
+                if (srcDstMapUid == null || dstSrcMapUid == null || srcDstMapUid != uid
+                        || dstSrcMapUid != uid) {
+
+                    logEntriesMap.put(srcDstMapKey, uid);
+                    logEntriesMap.put(dstSrcMapKey, uid);
+                }
+            }
+
+            /*
+             * Log.d(TAG, "+++ entry: (" + uid + ") in=" + in + " out=" + out +
+             * " " + src + ":" + spt + " -> " + dst + ":" + dpt + " proto=" +
+             * proto + " len=" + len);
+             */
+            /* Timestamp,UID,In,Out,Src,Dst,Len,Proto */
+
+            logWriter.println(System.currentTimeMillis() + "," + uid + "," + in + "," + out + ","
+                    + src + ":" + spt + "," + dst + ":" + dpt + "," + len + "," + proto);
         }
 
     }
@@ -437,5 +550,21 @@ public class CoreParser {
             return pos < len;
         }
 
+    }
+
+    public void initEntriesMap() {
+        ArrayList<NetStat.Connection> connections = netstat.getConnections();
+
+        for (NetStat.Connection connection : connections) {
+            String mapKey = connection.src + ":" + connection.spt + " -> " + connection.dst + ":"
+                    + connection.dpt;
+
+            logEntriesMap.put(mapKey, Integer.valueOf(connection.uid));
+
+            mapKey = connection.dst + ":" + connection.dpt + " -> " + connection.src + ":"
+                    + connection.spt;
+
+            logEntriesMap.put(mapKey, Integer.valueOf(connection.uid));
+        }
     }
 }
