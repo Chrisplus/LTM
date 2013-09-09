@@ -80,12 +80,11 @@ public class LogService extends Service {
     }
 
     private void removeNotification() {
-        NotificationManager notiManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notiManager.cancel(Constants.NOTIFICATION_ID);
+        stopForeground(true);
     }
 
     private void addNotification() {
-        updateNotification(false);
+        startForeground(Constants.NOTIFICATION_ID, getNotification(false));
     }
 
     private Notification getNotification(boolean isActavied) {

@@ -14,10 +14,10 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import com.chrisplus.ltm.R;
 import com.chrisplus.ltm.utils.Constants;
+import com.chrisplus.ltm.utils.ShellCommand;
 import com.chrisplus.ltm.utils.SysUtils;
-import com.chrisplus.rootmanager.RootManager;
-import com.chrisplus.rootmanager.container.Command;
 
 /**
  * This class is used to run log task.
@@ -29,41 +29,86 @@ public class CoreLogger implements Runnable {
     private final static String TAG = CoreLogger.class.getSimpleName();
 
     private Context context;
-    private Command command;
     private CoreParser parser;
+    private boolean running = false;
+    private ShellCommand command;
 
     public CoreLogger(Context ctx) {
         context = ctx;
         parser = new CoreParser();
-        command = new Command("sh "
-                + new ContextWrapper(context).getFilesDir().getAbsolutePath()
-                + File.separator + Constants.EXE_SCRIPT) {
+        startLoggerCommand();
 
-            @Override
-            public void onFinished(int arg0) {
-
-            }
-
-            @Override
-            public void onUpdate(int arg0, String arg1) {
-                /* To Process the Log */
-                parser.processRawLog(arg1);
-            }
-
-        };
     }
 
     @Override
     public void run() {
-        if (command != null) {
-            RootManager.getInstance().runCommandOnline(command);
+        Log.d(TAG, TAG + " starting");
+        String result;
+        running = true;
+
+        while (true) {
+            while (running && command.checkForExit() == false) {
+                if (command.stdoutAvailable()) {
+                    result = command.readStdout();
+                } else {
+                    try {
+                        Thread.sleep(500);
+                    } catch (Exception e) {
+                        Log.d(TAG, "exception while sleeping", e);
+                    }
+
+                    continue;
+                }
+
+                if (running == false) {
+                    break;
+                }
+
+                if (result == null) {
+                    Log.d(TAG, " read null; exiting");
+                    break;
+                }
+                parser.processRawLog(result);
+            }
+
+            if (running != false) {
+                Log.d(TAG,
+                        "terminated unexpectedly, restarting in 10 seconds");
+                try {
+                    Thread.sleep(10000);
+                } catch (Exception e) {
+                    // ignored
+                }
+                if (!startLoggerCommand()) {
+                    running = false;
+                }
+            } else {
+                Log.d(TAG, "reached end of loop; exiting");
+                break;
+            }
         }
     }
 
-    public void terminate() {
-        if (command != null) {
-            command.terminate("Serice Shut it Down");
+    public boolean startLoggerCommand() {
+
+        command = new ShellCommand(new String[] {
+                "su", "-c", "sh " + new ContextWrapper(context).getFilesDir().getAbsolutePath()
+                        + File.separator + Constants.EXE_SCRIPT
+        }, TAG);
+        final String error = command.start(false);
+
+        if (error != null) {
+            SysUtils.showError(context, context.getString(R.string.error_default_title), error);
+            return false;
+        } else {
+            return true;
         }
+
+    }
+
+    public void terminate() {
+        running = false;
+
         /* Close Parser */
         if (parser != null) {
             parser.close();
