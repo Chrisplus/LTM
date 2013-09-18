@@ -3,4 +3,4 @@ LTM
 
 A tool to collect Android network traffic information 
 
-Test in mac.
+Test in PDCC.
